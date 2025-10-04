@@ -204,4 +204,24 @@
   .animate-spin-slow {
     animation: spin-slow 3s linear infinite;
   }
+
+  /* Mobile-specific optimizations */
+  @media (max-width: 640px) {
+    .animate-float,
+    .animate-float-delayed,
+    .animate-float-slow {
+      animation-duration: 4s; /* Slower animations on mobile for better performance */
+    }
+    
+    /* Reduce motion for users who prefer reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .animate-float,
+      .animate-float-delayed,
+      .animate-float-slow,
+      .animate-gradient,
+      .animate-spin-slow {
+        animation: none;
+      }
+    }
+  }
 }

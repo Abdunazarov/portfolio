@@ -21,9 +21,16 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
+      // Only track mouse position on desktop devices
+      if (window.innerWidth >= 768) {
+        setMousePosition({ x: e.clientX, y: e.clientY })
+      }
     }
-    window.addEventListener("mousemove", handleMouseMove)
+    
+    if (window.innerWidth >= 768) {
+      window.addEventListener("mousemove", handleMouseMove)
+    }
+    
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
 
@@ -110,42 +117,42 @@ export default function PortfolioPage() {
         {/* Hero Section */}
         <section
           ref={heroRef}
-          className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6"
+          className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 sm:px-6"
         >
           {/* Animated particles background */}
           <div className="absolute inset-0 opacity-40">
             <HeroParticles />
           </div>
 
-          {/* Gradient orbs that follow mouse */}
+          {/* Gradient orbs that follow mouse - reduced size on mobile */}
           <div
-            className="pointer-events-none absolute h-96 w-96 rounded-full bg-[oklch(0.45_0.25_250)] opacity-20 blur-3xl transition-all duration-1000"
+            className="pointer-events-none absolute h-48 w-48 sm:h-96 sm:w-96 rounded-full bg-[oklch(0.45_0.25_250)] opacity-20 blur-3xl transition-all duration-1000"
             style={{
               transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`,
-              left: "20%",
+              left: "10%",
               top: "30%",
             }}
           />
           <div
-            className="pointer-events-none absolute h-96 w-96 rounded-full bg-[oklch(0.55_0.25_280)] opacity-20 blur-3xl transition-all duration-1000"
+            className="pointer-events-none absolute h-48 w-48 sm:h-96 sm:w-96 rounded-full bg-[oklch(0.55_0.25_280)] opacity-20 blur-3xl transition-all duration-1000"
             style={{
               transform: `translate(${mousePosition.x * -0.02}px, ${mousePosition.y * -0.02}px)`,
-              right: "20%",
+              right: "10%",
               bottom: "30%",
             }}
           />
 
-          {/* Floating geometric shapes */}
-          <div className="absolute inset-0 overflow-hidden">
+          {/* Floating geometric shapes - hidden on small screens */}
+          <div className="absolute inset-0 overflow-hidden hidden sm:block">
             <div className="absolute left-[10%] top-[20%] h-20 w-20 animate-float border-2 border-[oklch(0.45_0.25_250)] opacity-20" />
             <div className="absolute right-[15%] top-[40%] h-16 w-16 animate-float-delayed rounded-full border-2 border-[oklch(0.45_0.25_250)] opacity-20" />
             <div className="absolute bottom-[30%] left-[20%] h-12 w-12 animate-float-slow rotate-45 border-2 border-[oklch(0.45_0.25_250)] opacity-20" />
           </div>
 
-          <div className="relative z-10 max-w-4xl text-center">
+          <div className="relative z-10 max-w-4xl text-center px-4">
             <div className="mb-6 overflow-hidden">
               <h1
-                className={`font-sans text-6xl font-bold leading-tight tracking-tight transition-all duration-1000 md:text-8xl ${
+                className={`font-sans text-4xl sm:text-6xl lg:text-8xl font-bold leading-tight tracking-tight transition-all duration-1000 ${
                   isHeroVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
                 }`}
               >
@@ -155,7 +162,7 @@ export default function PortfolioPage() {
               </h1>
             </div>
             <p
-              className={`mb-12 text-balance text-xl text-muted-foreground transition-all delay-300 duration-1000 md:text-2xl ${
+              className={`mb-8 sm:mb-12 text-balance text-lg sm:text-xl lg:text-2xl text-muted-foreground transition-all delay-300 duration-1000 ${
                 isHeroVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
               }`}
             >
@@ -164,7 +171,7 @@ export default function PortfolioPage() {
             <Button
               onClick={scrollToWork}
               size="lg"
-              className={`group relative overflow-hidden bg-[oklch(0.45_0.25_250)] text-white shadow-lg shadow-[oklch(0.45_0.25_250)]/20 transition-all delay-500 duration-1000 hover:bg-[oklch(0.40_0.25_250)] hover:shadow-xl hover:shadow-[oklch(0.45_0.25_250)]/30 ${
+              className={`group relative overflow-hidden bg-[oklch(0.45_0.25_250)] text-white shadow-lg shadow-[oklch(0.45_0.25_250)]/20 transition-all delay-500 duration-1000 hover:bg-[oklch(0.40_0.25_250)] hover:shadow-xl hover:shadow-[oklch(0.45_0.25_250)]/30 text-base sm:text-lg px-6 py-3 sm:px-8 sm:py-4 ${
                 isHeroVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
               }`}
             >
@@ -175,26 +182,26 @@ export default function PortfolioPage() {
 
           {/* Scroll indicator */}
           <div
-            className={`absolute bottom-12 transition-all delay-700 duration-1000 ${
+            className={`absolute bottom-8 sm:bottom-12 transition-all delay-700 duration-1000 ${
               isHeroVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
             }`}
           >
             <div className="flex flex-col items-center gap-2">
-              <span className="text-sm text-muted-foreground">Scroll to explore</span>
-              <div className="h-8 w-5 rounded-full border-2 border-muted-foreground/30">
-                <div className="mx-auto mt-2 h-2 w-1 animate-bounce rounded-full bg-[oklch(0.45_0.25_250)]" />
+              <span className="text-xs sm:text-sm text-muted-foreground">Scroll to explore</span>
+              <div className="h-6 w-4 sm:h-8 sm:w-5 rounded-full border-2 border-muted-foreground/30">
+                <div className="mx-auto mt-1.5 sm:mt-2 h-1.5 w-0.5 sm:h-2 sm:w-1 animate-bounce rounded-full bg-[oklch(0.45_0.25_250)]" />
               </div>
             </div>
           </div>
         </section>
 
         {/* Timeline Section */}
-        <section id="timeline" className="px-6 py-24">
+        <section id="timeline" className="px-4 sm:px-6 py-16 sm:py-24">
           <div className="mx-auto max-w-4xl">
-            <h2 className="mb-16 text-center font-sans text-5xl font-bold">Experience</h2>
+            <h2 className="mb-12 sm:mb-16 text-center font-sans text-3xl sm:text-4xl lg:text-5xl font-bold">Experience</h2>
             <div className="relative">
-              {/* Timeline line */}
-              <div className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-border" />
+              {/* Timeline line - hidden on mobile, shown on larger screens */}
+              <div className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-border hidden md:block" />
 
               {timelineData.map((item, index) => (
                 <TimelineItem key={index} {...item} index={index} />
@@ -204,10 +211,10 @@ export default function PortfolioPage() {
         </section>
 
         {/* Skills Section */}
-        <section className="bg-secondary/30 px-6 py-24">
+        <section className="bg-secondary/30 px-4 sm:px-6 py-16 sm:py-24">
           <div className="mx-auto max-w-6xl">
-            <h2 className="mb-16 text-center font-sans text-5xl font-bold">Skills</h2>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            <h2 className="mb-12 sm:mb-16 text-center font-sans text-3xl sm:text-4xl lg:text-5xl font-bold">Skills</h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
               {skills.map((skill, index) => (
                 <SkillCard key={index} skill={skill} index={index} />
               ))}
@@ -219,14 +226,14 @@ export default function PortfolioPage() {
         <AboutSection />
 
         {/* Contact Section */}
-        <section className="px-6 py-24">
+        <section className="px-4 sm:px-6 py-16 sm:py-24">
           <div className="mx-auto max-w-4xl">
-            <h2 className="mb-6 text-center font-sans text-5xl font-bold">Get In Touch</h2>
-            <p className="mb-16 text-center text-xl text-muted-foreground">
+            <h2 className="mb-4 sm:mb-6 text-center font-sans text-3xl sm:text-4xl lg:text-5xl font-bold">Get In Touch</h2>
+            <p className="mb-12 sm:mb-16 text-center text-lg sm:text-xl text-muted-foreground px-4">
               Let's connect and build something amazing together
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-8">
+            <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:flex-wrap sm:gap-8">
               {socialLinks.map((social, index) => (
                 <SocialIcon key={index} {...social} index={index} />
               ))}
@@ -235,8 +242,8 @@ export default function PortfolioPage() {
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-border px-6 py-12 text-center text-muted-foreground">
-          <p>© 2025 Dior Abdunazarov</p>
+        <footer className="border-t border-border px-4 sm:px-6 py-8 sm:py-12 text-center text-muted-foreground">
+          <p className="text-sm sm:text-base">© 2025 Dior Abdunazarov</p>
         </footer>
       </div>
     </div>

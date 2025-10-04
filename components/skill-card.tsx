@@ -63,7 +63,7 @@ export function SkillCard({ skill, index }: SkillCardProps) {
       onMouseLeave={handleMouseLeave}
     >
       <div
-        className={`relative overflow-hidden rounded-lg border-2 border-border bg-white p-6 text-center transition-all duration-300 hover:border-[oklch(0.45_0.25_250)] hover:shadow-2xl hover:shadow-[oklch(0.45_0.25_250)]/20 ${
+        className={`relative overflow-hidden rounded-lg border-2 border-border bg-white p-4 sm:p-6 text-center transition-all duration-300 hover:border-[oklch(0.45_0.25_250)] hover:shadow-2xl hover:shadow-[oklch(0.45_0.25_250)]/20 ${
           isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
         }`}
         style={{
@@ -89,7 +89,7 @@ export function SkillCard({ skill, index }: SkillCardProps) {
 
         <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
 
-        <p className="relative z-10 font-sans text-lg font-semibold transition-all duration-300 group-hover:scale-110 group-hover:text-[oklch(0.45_0.25_250)]">
+        <p className="relative z-10 font-sans text-base sm:text-lg font-semibold transition-all duration-300 group-hover:scale-110 group-hover:text-[oklch(0.45_0.25_250)]">
           {skill}
         </p>
       </div>

@@ -55,17 +55,17 @@ export function TimelineItem({
   const isEven = index % 2 === 0
 
   return (
-    <div ref={itemRef} className={`relative mb-24 flex items-start ${isEven ? "flex-row" : "flex-row-reverse"}`}>
+    <div ref={itemRef} className={`relative mb-16 sm:mb-24 flex items-start ${isEven ? "md:flex-row" : "md:flex-row-reverse"}`}>
       {/* Content */}
       <div
-        className={`w-5/12 transition-all duration-700 delay-100 ${
-          isVisible ? "translate-x-0 opacity-100" : isEven ? "-translate-x-12 opacity-0" : "translate-x-12 opacity-0"
+        className={`w-full md:w-5/12 transition-all duration-700 delay-100 ${
+          isVisible ? "translate-x-0 opacity-100" : isEven ? "-translate-x-12 opacity-0" : "md:translate-x-12 -translate-x-12 opacity-0"
         }`}
       >
         <div
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="group relative overflow-hidden rounded-xl border-2 border-border bg-white p-8 shadow-sm transition-all duration-500 hover:border-[oklch(0.45_0.25_250)] hover:shadow-2xl hover:-translate-y-2"
+          className="group relative overflow-hidden rounded-xl border-2 border-border bg-white p-6 sm:p-8 shadow-sm transition-all duration-500 hover:border-[oklch(0.45_0.25_250)] hover:shadow-2xl hover:-translate-y-2"
         >
           <div
             className={`absolute inset-0 bg-gradient-to-br from-[oklch(0.45_0.25_250)]/5 via-transparent to-[oklch(0.45_0.25_250)]/5 opacity-0 transition-opacity duration-500 ${
@@ -80,14 +80,14 @@ export function TimelineItem({
           />
 
           <div className="relative z-10">
-            <div className="mb-4 flex items-start justify-between gap-4">
+            <div className="mb-4 flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-4">
               <div className="flex-1">
-                <h3 className="mb-1 font-sans text-2xl font-bold leading-tight transition-colors duration-300 group-hover:text-[oklch(0.45_0.25_250)]">
+                <h3 className="mb-1 font-sans text-xl sm:text-2xl font-bold leading-tight transition-colors duration-300 group-hover:text-[oklch(0.45_0.25_250)]">
                   {title}
                 </h3>
                 <p className="text-sm font-semibold text-muted-foreground">{role}</p>
               </div>
-              <Badge className="shrink-0 bg-[oklch(0.45_0.25_250)] text-white transition-transform duration-300 group-hover:scale-110">
+              <Badge className="shrink-0 bg-[oklch(0.45_0.25_250)] text-white transition-transform duration-300 group-hover:scale-110 self-start sm:self-auto">
                 {year}
               </Badge>
             </div>
@@ -102,7 +102,7 @@ export function TimelineItem({
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
 
-            <p className="mb-6 text-pretty leading-relaxed text-muted-foreground">{description}</p>
+            <p className="mb-6 text-pretty leading-relaxed text-muted-foreground text-sm sm:text-base">{description}</p>
 
             <ul className="mb-6 space-y-3">
               {details.map((detail, idx) => (
@@ -136,8 +136,8 @@ export function TimelineItem({
         </div>
       </div>
 
-      {/* Center dot with enhanced animation */}
-      <div className="absolute left-1/2 z-10 flex h-8 w-8 -translate-x-1/2 items-center justify-center">
+      {/* Center dot with enhanced animation - hidden on mobile, shown on md+ */}
+      <div className="absolute left-1/2 z-10 flex h-8 w-8 -translate-x-1/2 items-center justify-center hidden md:flex">
         <div
           className={`h-5 w-5 rounded-full border-4 border-white bg-[oklch(0.45_0.25_250)] shadow-lg transition-all duration-700 ${
             isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"
@@ -147,8 +147,8 @@ export function TimelineItem({
         </div>
       </div>
 
-      {/* Spacer */}
-      <div className="w-5/12" />
+      {/* Spacer - only on desktop */}
+      <div className="w-5/12 hidden md:block" />
     </div>
   )
 }

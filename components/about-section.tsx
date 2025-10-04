@@ -32,7 +32,8 @@ export function AboutSection() {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (sectionRef.current) {
+      // Only track mouse position on desktop devices
+      if (window.innerWidth >= 768 && sectionRef.current) {
         const rect = sectionRef.current.getBoundingClientRect()
         setMousePosition({
           x: (e.clientX - rect.left - rect.width / 2) / 50,
@@ -41,13 +42,16 @@ export function AboutSection() {
       }
     }
 
-    window.addEventListener("mousemove", handleMouseMove)
+    if (window.innerWidth >= 768) {
+      window.addEventListener("mousemove", handleMouseMove)
+    }
+    
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden px-6 py-24">
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+    <section ref={sectionRef} className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24">
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none hidden sm:block">
         <div
           className="absolute left-[8%] top-[15%] font-mono text-xs text-[oklch(0.45_0.25_250)] animate-float"
           style={{
@@ -104,23 +108,23 @@ export function AboutSection() {
         </div>
       </div>
 
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
         <div
-          className="absolute left-[5%] top-[15%] h-24 w-24 rounded-lg border border-[oklch(0.45_0.25_250)]/10 animate-float rotate-12"
+          className="absolute left-[5%] top-[15%] h-16 w-16 sm:h-24 sm:w-24 rounded-lg border border-[oklch(0.45_0.25_250)]/10 animate-float rotate-12"
           style={{
             transform: `translate(${mousePosition.x * 1.5}px, ${mousePosition.y * 1.5}px) rotate(12deg)`,
             transition: "transform 0.3s ease-out",
           }}
         />
         <div
-          className="absolute right-[10%] top-[25%] h-20 w-20 rounded-full border border-[oklch(0.55_0.25_280)]/10 animate-float-delayed"
+          className="absolute right-[10%] top-[25%] h-12 w-12 sm:h-20 sm:w-20 rounded-full border border-[oklch(0.55_0.25_280)]/10 animate-float-delayed"
           style={{
             transform: `translate(${mousePosition.x * -1.2}px, ${mousePosition.y * -1.2}px)`,
             transition: "transform 0.3s ease-out",
           }}
         />
         <div
-          className="absolute left-[15%] bottom-[20%] h-16 w-16 border border-[oklch(0.45_0.25_250)]/10 animate-float-slow rotate-45"
+          className="absolute left-[15%] bottom-[20%] h-10 w-10 sm:h-16 sm:w-16 border border-[oklch(0.45_0.25_250)]/10 animate-float-slow rotate-45"
           style={{
             transform: `translate(${mousePosition.x * 1}px, ${mousePosition.y * 1}px) rotate(45deg)`,
             transition: "transform 0.3s ease-out",
@@ -130,7 +134,7 @@ export function AboutSection() {
 
       <div className="relative z-10 mx-auto max-w-3xl">
         <h2
-          className={`mb-12 text-center font-sans text-5xl font-bold transition-all duration-700 ${
+          className={`mb-8 sm:mb-12 text-center font-sans text-3xl sm:text-4xl lg:text-5xl font-bold transition-all duration-700 ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
           }`}
         >
@@ -138,9 +142,9 @@ export function AboutSection() {
         </h2>
 
         {/* Main description */}
-        <div className="space-y-6">
+        <div className="space-y-6 px-4">
           <p
-            className={`text-balance text-center text-xl leading-relaxed text-foreground transition-all delay-200 duration-700 ${
+            className={`text-balance text-center text-lg sm:text-xl leading-relaxed text-foreground transition-all delay-200 duration-700 ${
               isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
             }`}
           >
@@ -160,7 +164,7 @@ export function AboutSection() {
         </div>
 
         <div
-          className={`mt-16 grid grid-cols-3 gap-6 transition-all delay-400 duration-700 ${
+          className={`mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 transition-all delay-400 duration-700 ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
           }`}
         >
@@ -171,29 +175,29 @@ export function AboutSection() {
           ].map((stat, index) => (
             <div
               key={stat.label}
-              className="group relative overflow-hidden rounded-xl border-2 border-border bg-white p-6 text-center transition-all duration-500 hover:border-[oklch(0.45_0.25_250)] hover:shadow-2xl hover:shadow-[oklch(0.45_0.25_250)]/20 hover:-translate-y-2"
+              className="group relative overflow-hidden rounded-xl border-2 border-border bg-white p-4 sm:p-6 text-center transition-all duration-500 hover:border-[oklch(0.45_0.25_250)] hover:shadow-2xl hover:shadow-[oklch(0.45_0.25_250)]/20 hover:-translate-y-2"
               style={{ transitionDelay: `${400 + index * 100}ms` }}
             >
               <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[oklch(0.45_0.25_250)]/0 via-[oklch(0.55_0.25_280)]/0 to-[oklch(0.45_0.25_250)]/0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:from-[oklch(0.45_0.25_250)]/5 group-hover:via-[oklch(0.55_0.25_280)]/10 group-hover:to-[oklch(0.45_0.25_250)]/5" />
 
-              <div className="absolute right-0 top-0 h-12 w-12 opacity-0 transition-all duration-500 group-hover:opacity-100">
+              <div className="absolute right-0 top-0 h-8 w-8 sm:h-12 sm:w-12 opacity-0 transition-all duration-500 group-hover:opacity-100">
                 <div
-                  className="absolute right-0 top-0 h-[2px] w-8 origin-right transition-all duration-500 group-hover:w-12"
+                  className="absolute right-0 top-0 h-[2px] w-6 sm:w-8 origin-right transition-all duration-500 group-hover:w-8 sm:group-hover:w-12"
                   style={{ backgroundColor: stat.color }}
                 />
                 <div
-                  className="absolute right-0 top-0 h-8 w-[2px] origin-top transition-all duration-500 group-hover:h-12"
+                  className="absolute right-0 top-0 h-6 sm:h-8 w-[2px] origin-top transition-all duration-500 group-hover:h-8 sm:group-hover:h-12"
                   style={{ backgroundColor: stat.color }}
                 />
               </div>
 
               <div
-                className="text-4xl font-bold transition-all duration-500 group-hover:scale-110"
+                className="text-2xl sm:text-3xl lg:text-4xl font-bold transition-all duration-500 group-hover:scale-110"
                 style={{ color: stat.color }}
               >
                 {stat.number}
               </div>
-              <div className="mt-2 text-sm font-medium text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
+              <div className="mt-2 text-xs sm:text-sm font-medium text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
                 {stat.label}
               </div>
             </div>
