@@ -833,7 +833,7 @@ function frame(now) {
     current.position.y = lift + (REDUCED ? 0 : Math.sin(t * 1.6) * (u.float ? 0.055 : 0.012));
     /* head follows the cursor, in the character's own frame */
     if (u.head) {
-      u.head.rotation.y += ((-mouse.x * 0.6 - spin) - u.head.rotation.y) * k;
+      u.head.rotation.y += ((mouse.x * 0.6 - spin) - u.head.rotation.y) * k;
       u.head.rotation.x += ((mouse.y * 0.30 + (u.lookDown || 0)) - u.head.rotation.x) * k;
     }
     if (!REDUCED) {
@@ -922,19 +922,6 @@ const CHIP_FACES = [
     c.fillStyle = '#3a3f3c'; c.fillRect(1, 2, 2, 2); c.fillRect(5, 2, 2, 2);
     c.fillStyle = '#a9adaa'; c.fillRect(3, 3, 2, 4);
   },
-  (c) => {                                   // Villager
-    c.fillStyle = '#c99b76'; c.fillRect(0, 0, 8, 10);
-    c.fillStyle = '#3b2a1c'; c.fillRect(0, 0, 8, 3);
-    c.fillStyle = '#2e2117'; c.fillRect(0, 3, 8, 1);
-    c.fillStyle = '#f2f2f2'; c.fillRect(1, 4, 2, 2); c.fillRect(5, 4, 2, 2);
-    c.fillStyle = '#2f7a35'; c.fillRect(2, 5, 1, 1); c.fillRect(5, 5, 1, 1);
-    c.fillStyle = '#b1855f'; c.fillRect(3, 6, 2, 3);
-  },
-  (c) => {                                   // Enderman
-    c.fillStyle = '#0d0c14'; c.fillRect(0, 0, 8, 8);
-    c.fillStyle = '#c79bff'; c.fillRect(0, 3, 3, 2); c.fillRect(5, 3, 3, 2);
-    c.fillStyle = '#ffffff'; c.fillRect(1, 3, 1, 2); c.fillRect(6, 3, 1, 2);
-  },
   (c) => {                                   // Creeper
     for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
       const v = 62 + Math.random() * 44;
@@ -945,6 +932,19 @@ const CHIP_FACES = [
     c.fillRect(1, 2, 2, 2); c.fillRect(5, 2, 2, 2);
     c.fillRect(3, 4, 2, 3); c.fillRect(2, 4, 1, 2); c.fillRect(5, 4, 1, 2);
     c.fillRect(2, 6, 1, 2); c.fillRect(5, 6, 1, 2);
+  },
+  (c) => {                                   // Enderman
+    c.fillStyle = '#0d0c14'; c.fillRect(0, 0, 8, 8);
+    c.fillStyle = '#c79bff'; c.fillRect(0, 3, 3, 2); c.fillRect(5, 3, 3, 2);
+    c.fillStyle = '#ffffff'; c.fillRect(1, 3, 1, 2); c.fillRect(6, 3, 1, 2);
+  },
+  (c) => {                                   // Villager
+    c.fillStyle = '#c99b76'; c.fillRect(0, 0, 8, 10);
+    c.fillStyle = '#3b2a1c'; c.fillRect(0, 0, 8, 3);
+    c.fillStyle = '#2e2117'; c.fillRect(0, 3, 8, 1);
+    c.fillStyle = '#f2f2f2'; c.fillRect(1, 4, 2, 2); c.fillRect(5, 4, 2, 2);
+    c.fillStyle = '#2f7a35'; c.fillRect(2, 5, 1, 1); c.fillRect(5, 5, 1, 1);
+    c.fillStyle = '#b1855f'; c.fillRect(3, 6, 2, 3);
   }
 ];
 chips.forEach((chip, i) => {
@@ -956,6 +956,27 @@ chips.forEach((chip, i) => {
 });
 
 const hint = document.getElementById('hint');
+
+/* the yellow splash line, the way the title screen does it */
+const splash = document.getElementById('splash');
+const SPLASHES = [
+  'Automation is just redstone!',
+  'It compiles!',
+  '99.9% uptime!',
+  'Now with 100% more agents!',
+  'No creepers were harmed!',
+  'Ships on Fridays!',
+  'Powered by coffee and YAML!',
+  'The logs are green!'
+];
+if (splash) {
+  let si = 0;
+  splash.textContent = SPLASHES[0];
+  setInterval(() => {
+    si = (si + 1) % SPLASHES.length;
+    splash.textContent = SPLASHES[si];
+  }, 4200);
+}
 let hinted = false;
 const dropHint = () => {
   if (hinted) return;

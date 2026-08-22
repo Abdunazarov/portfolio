@@ -77,7 +77,7 @@ body{
 #track{position:relative; z-index:4}
 section{
   min-height:100svh; display:flex; align-items:center;
-  padding:clamp(4rem,10vh,7rem) 0 clamp(7rem,12vh,9rem);
+  padding:clamp(3.5rem,8vh,6rem) 0 clamp(6rem,10vh,8rem);
 }
 .wrap{width:min(84rem,100% - 3rem); margin-inline:auto; display:grid; grid-template-columns:1fr 1fr; gap:2rem}
 .card{
@@ -87,13 +87,29 @@ section{
   padding:clamp(1.3rem,2.4vw,2rem);
   backdrop-filter:blur(3px);
   display:flex; flex-direction:column; gap:.95rem;
-  max-width:34rem;
+  max-width:34rem; position:relative;
+  /* a section is always exactly one screen; a long card scrolls inside itself */
+  max-height:74svh; overflow-y:auto; scrollbar-width:thin;
 }
+.facts{
+  display:flex; flex-wrap:wrap; gap:.3rem 1.15rem;
+  font-family:"Pixelify Sans",monospace; font-size:.9rem; color:var(--dim);
+}
+.facts b{color:var(--ink); font-weight:500}
+#splash{
+  align-self:flex-end; margin:-.85rem .3rem -.45rem 0;
+  font-family:"Pixelify Sans",monospace; font-size:clamp(.8rem,1.2vw,1rem);
+  color:#ffd94a; text-shadow:2px 2px 0 rgba(0,0,0,.6);
+  transform:rotate(-7deg); pointer-events:none;
+  animation:splash 1.15s ease-in-out infinite alternate;
+}
+@keyframes splash{from{scale:1}to{scale:1.06}}
+@media (max-width:900px){ #splash{display:none} }
 .on-left .card{grid-column:1}
 .on-right .card{grid-column:2; justify-self:end}
 
 h1,h2{margin:0; text-wrap:balance; font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; letter-spacing:-.02em}
-h1{font-size:clamp(2.6rem,6.2vw,4.6rem); line-height:.98}
+h1{font-size:clamp(2.2rem,4.4vw,3.6rem); line-height:1.02}
 h2{font-size:clamp(1.9rem,3.6vw,2.9rem); line-height:1.02}
 p{margin:0}
 .kicker{
@@ -164,7 +180,7 @@ p{margin:0}
 .chip-pick.on b,.chip-pick:hover b{opacity:1}
 
 #hint{
-  position:fixed; left:50%; bottom:clamp(5.2rem,10vh,6.4rem); transform:translateX(-50%); z-index:10;
+  position:fixed; left:50%; bottom:clamp(6.6rem,12vh,7.8rem); transform:translateX(-50%); z-index:10;
   font-family:"Pixelify Sans",monospace; font-size:.85rem; color:#fff;
   text-shadow:1px 1px 0 rgba(0,0,0,.8); pointer-events:none; transition:opacity .5s;
 }
@@ -210,12 +226,18 @@ p{margin:0}
       <div class="card">
         <span class="kicker">AI Automation &middot; Full-stack &middot; Infrastructure</span>
         <h1>Dior<br>Abdunazarov</h1>
-        <p class="lead">I build systems that run themselves &mdash; AI agents that talk to customers,
-          automation that replaces manual work, and the infrastructure holding it all up.</p>
-        <p class="meta">Kuala Lumpur &middot; 4 years shipping to production</p>
+        <span id="splash">Automation is just redstone!</span>
+        <p class="lead">I build things that keep running after I log off &mdash; AI agents that
+          talk to customers, automation that eats the manual work, and the infrastructure
+          holding it all up.</p>
+        <div class="facts">
+          <span>Based in <b>Kuala Lumpur</b></span>
+          <span><b>4 years</b> in production</span>
+          <span><b>3 countries</b>, 5 teams</span>
+        </div>
         <div class="btns">
           <a class="btn pri" href="#gigwave">See the work</a>
-          <a class="btn" href="#contact">Get in touch</a>
+          <a class="btn" href="#contact">Contacts</a>
         </div>
       </div>
     </div>
@@ -224,7 +246,7 @@ p{margin:0}
   <section id="gigwave" data-cast="allay" data-side="left" data-tint="#4fc3f0" class="on-right">
     <div class="wrap">
       <div class="card">
-        <span class="kicker">Nov 2025 &mdash; Present &middot; Kuala Lumpur, Remote</span>
+        <span class="kicker">Nov 2025 &mdash; Present &middot; Kuala Lumpur, Malaysia &middot; Remote</span>
         <h2>GigWave</h2>
         <p class="meta">Full-stack Developer</p>
         <p class="lead">Building AI-powered marketing automation agents at GigWave &mdash; an AI growth
@@ -248,7 +270,7 @@ p{margin:0}
   <section id="cifragen" data-cast="golem" data-side="right" data-tint="#c9cec9" class="on-left">
     <div class="wrap">
       <div class="card">
-        <span class="kicker">Sep 2024 &mdash; Present</span>
+        <span class="kicker">Sep 2024 &mdash; Present &middot; Moscow, Russia</span>
         <h2>Cifragen</h2>
         <p class="meta">Backend &amp; Infrastructure Engineer</p>
         <p class="lead">Architecture and DevOps. I keep the servers, pipelines and LLM systems standing,
@@ -265,10 +287,45 @@ p{margin:0}
     </div>
   </section>
 
+  <section id="gabumas" data-cast="creeper" data-side="left" data-tint="#e0402f" class="on-right">
+    <div class="wrap">
+      <div class="card">
+        <span class="kicker">2022 &mdash; 2024 &middot; Moscow, Russia</span>
+        <h2>Gabumas Ltd.</h2>
+        <p class="meta">Backend Engineer &middot; MovieLab</p>
+        <p class="lead">Kept the APIs alive for 350,000 users, and made them fast enough that nobody
+          had to think about them.</p>
+        <div class="stat"><span>API response</span><b>800ms &rarr; 120ms</b></div>
+        <div class="stat"><span>Uptime</span><b>99.9% &middot; 350k users</b></div>
+        <div class="lnks"><a class="lnk" href="https://movielab.one" target="_blank" rel="noopener">movielab.one</a></div>
+        <div class="tags"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">Redis</span><span class="tag">MongoDB</span><span class="tag">AWS</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="starpets" data-cast="enderman" data-side="right" data-tint="#b57ce0" class="on-left">
+    <div class="wrap">
+      <div class="card">
+        <span class="kicker">2023 &mdash; 2024 &middot; Saint Petersburg, Russia</span>
+        <h2>Starpets</h2>
+        <p class="meta">Software Developer &middot; team of 10</p>
+        <p class="lead">Automated Roblox gameplay with computer vision, OCR and real-time voice AI.</p>
+        <ul class="bul">
+          <li><i></i><span>CV and OCR systems recognising game objects and text, automating core gameplay loops</span></li>
+          <li><i></i><span>AI voice chat over SIP/RTP and LLMs for real-time virtual assistants</span></li>
+          <li><i></i><span>Automated deployment and monitoring across Linux and Windows with centralised logging</span></li>
+          <li><i></i><span>Set the coding standards the team worked to</span></li>
+        </ul>
+        <div class="lnks"><a class="lnk" href="https://starpets.gg" target="_blank" rel="noopener">starpets.gg</a></div>
+        <div class="tags"><span class="tag">Computer Vision</span><span class="tag">OCR</span><span class="tag">SIP/RTP</span><span class="tag">WebSockets</span><span class="tag">Selenium</span></div>
+      </div>
+    </div>
+  </section>
+
   <section id="napa" data-cast="villager" data-side="left" data-tint="#8ec24d" class="on-right">
     <div class="wrap">
       <div class="card">
-        <span class="kicker">2024 &mdash; 2025</span>
+        <span class="kicker">2024 &mdash; 2025 &middot; Tashkent, Uzbekistan</span>
         <h2>NAPA</h2>
         <p class="meta">Fullstack / Python Developer</p>
         <p class="lead">Sole developer across the whole stack: web apps, Telegram bots and internal
@@ -285,54 +342,17 @@ p{margin:0}
     </div>
   </section>
 
-  <section id="starpets" data-cast="enderman" data-side="right" data-tint="#b57ce0" class="on-left">
-    <div class="wrap">
-      <div class="card">
-        <span class="kicker">2023 &mdash; 2024 &middot; team of 10</span>
-        <h2>Starpets</h2>
-        <p class="meta">Software Developer</p>
-        <p class="lead">Automated Roblox gameplay with computer vision, OCR and real-time voice AI.</p>
-        <ul class="bul">
-          <li><i></i><span>CV and OCR systems recognising game objects and text, automating core gameplay loops</span></li>
-          <li><i></i><span>AI voice chat over SIP/RTP and LLMs for real-time virtual assistants</span></li>
-          <li><i></i><span>Automated deployment and monitoring across Linux and Windows with centralised logging</span></li>
-          <li><i></i><span>Set the coding standards the team worked to</span></li>
-        </ul>
-        <div class="lnks"><a class="lnk" href="https://starpets.gg" target="_blank" rel="noopener">starpets.gg</a></div>
-        <div class="tags"><span class="tag">Computer Vision</span><span class="tag">OCR</span><span class="tag">SIP/RTP</span><span class="tag">WebSockets</span><span class="tag">Selenium</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="gabumas" data-cast="creeper" data-side="left" data-tint="#e0402f" class="on-right">
-    <div class="wrap">
-      <div class="card">
-        <span class="kicker">2022</span>
-        <h2>Gabumas Ltd.</h2>
-        <p class="meta">Backend Engineer &middot; MovieLab</p>
-        <p class="lead">Kept the APIs alive for 350,000 users, and made them fast enough that nobody
-          had to think about them.</p>
-        <div class="stat"><span>API response</span><b>800ms &rarr; 120ms</b></div>
-        <div class="stat"><span>Uptime</span><b>99.9% &middot; 350k users</b></div>
-        <div class="lnks"><a class="lnk" href="https://movielab.one" target="_blank" rel="noopener">movielab.one</a></div>
-        <div class="tags"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">Redis</span><span class="tag">MongoDB</span><span class="tag">AWS</span></div>
-      </div>
-    </div>
-  </section>
-
   <section id="contact" data-cast="steve" data-side="right" data-tint="#4fd0c8" class="on-left">
     <div class="wrap">
       <div class="card">
-        <span class="kicker">Open to work</span>
+        <span class="kicker">Spawn point</span>
         <h2>Let&rsquo;s build something</h2>
-        <p class="lead">AI agents, automation, backend and the infrastructure under it.
-          Telegram gets the fastest reply.</p>
+        <p class="lead">Telegram is the fastest way to reach me. The others work too.</p>
         <div class="btns">
           <a class="btn pri" href="https://t.me/D_Abdunazarov" target="_blank" rel="noopener">Telegram</a>
           <a class="btn" href="https://wa.me/+601153770330" target="_blank" rel="noopener">WhatsApp</a>
           <a class="btn" href="https://www.linkedin.com/in/dior-abdunazarov-a06aa7209/" target="_blank" rel="noopener">LinkedIn</a>
         </div>
-        <p class="meta" style="font-size:.78rem">&copy; 2026 Dior Abdunazarov &middot; voxel world and skins drawn from scratch &mdash; no Mojang assets used</p>
       </div>
     </div>
   </section>
@@ -345,9 +365,9 @@ p{margin:0}
   <button class="chip-pick on" aria-label="Dior"><canvas width="8" height="8"></canvas><b>Dior</b></button>
   <button class="chip-pick" aria-label="GigWave"><canvas width="8" height="8"></canvas><b>GigWave</b></button>
   <button class="chip-pick" aria-label="Cifragen"><canvas width="8" height="8"></canvas><b>Cifragen</b></button>
-  <button class="chip-pick" aria-label="NAPA"><canvas width="8" height="10"></canvas><b>NAPA</b></button>
-  <button class="chip-pick" aria-label="Starpets"><canvas width="8" height="8"></canvas><b>Starpets</b></button>
   <button class="chip-pick" aria-label="Gabumas"><canvas width="8" height="8"></canvas><b>Gabumas</b></button>
+  <button class="chip-pick" aria-label="Starpets"><canvas width="8" height="8"></canvas><b>Starpets</b></button>
+  <button class="chip-pick" aria-label="NAPA"><canvas width="8" height="10"></canvas><b>NAPA</b></button>
 </div>
 
 <script>__BUNDLE__</script>
