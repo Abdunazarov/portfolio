@@ -106,19 +106,20 @@ function skinnedSteve(img, s = 1) {
       pivot ? [pivot[0], pivot[1] * (1.06), pivot[2]] : null);
     grp.add(base, over);
     grp.position.set(x * P, y * P, z * P);
+    grp.userData = { base, over, key: k };
     return grp;
   };
+  const parts = {};
 
-  g.add(dual('legR', -2, 6, 0));
-  g.add(dual('legL', 2, 6, 0));
-  g.add(dual('body', 0, 18, 0));
-  const armL = dual('armL', -6.2, 24, 0, [0, -6, 0]);
-  const armR = dual('armR', 6.2, 24, 0, [0, -6, 0]);
-  g.add(armL, armR);
-  const head = dual('head', 0, 28, 0);
-  g.add(head);
+  parts.legR = dual('legR', -2, 6, 0);
+  parts.legL = dual('legL', 2, 6, 0);
+  parts.body = dual('body', 0, 18, 0);
+  parts.armL = dual('armL', -6.2, 24, 0, [0, -6, 0]);
+  parts.armR = dual('armR', 6.2, 24, 0, [0, -6, 0]);
+  parts.head = dual('head', 0, 28, 0);
+  Object.values(parts).forEach((p) => g.add(p));
   g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
-  g.userData = { head, armL, armR };
+  g.userData = { head: parts.head, armL: parts.armL, armR: parts.armR, parts };
   return g;
 }
 
@@ -316,7 +317,7 @@ const C = {
   boot: '#5b402a', bootLo: '#3f2c1c'
 };
 
-function diorSkin() {
+function diorSkin(bare) {
   const S = SKIN_S;
   const cv = document.createElement('canvas');
   cv.width = cv.height = 64 * S;
@@ -353,14 +354,12 @@ function diorSkin() {
   /* ---- the face ---- */
   const F = at(8, 8);
   F(0, 0, 8, 8, C.skin);
-  grit(8, 3, 8, 4, C.skinHi, 90);
-  grit(8, 5.6, 8, 2.4, C.skinLo, 130);                                 // jaw stubble
+  grit(8, 6.1, 8, 1.9, C.skinLo, 34);                                  // faint stubble on the jaw
   F(0, 5.4, 0.8, 2.6, C.skinLo); F(7.2, 5.4, 0.8, 2.6, C.skinLo);      // cheek shadows
 
   /* fringe with a ragged edge and a strand across the brow */
   const fr = [3.1, 3.4, 3.0, 2.7, 2.9, 3.3, 3.6, 3.3];
   for (let i = 0; i < 8; i++) F(i, 0, 1, fr[i], C.hair);
-  grit(8, 0, 8, 2.6, C.hairHi, 40);
   F(0, 2.9, 0.9, 1.5, C.hair); F(7.1, 2.9, 0.9, 1.5, C.hair);          // temples
 
   F(1, 3.5, 2.1, 0.75, C.brow); F(4.9, 3.5, 2.1, 0.75, C.brow);        // brows
@@ -387,10 +386,21 @@ function diorSkin() {
     B(O + 16 + i, 8, 1, 2.5 + Math.random() * 1.1, C.hair);            // left side
   }
   B(O + 12.6, 11, 2.1, 0.6, C.hair);
-  grit(O + 8, 8, 8, 3.4, C.hairLo, 90);
+  grit(O + 8, 8, 8, 3.4, C.hairLo, 40);
 
-  /* ================= hoodie ================= */
+  /* ================= torso ================= */
   const bodyT = at(20, 16), bodyF = at(20, 20), bodyB = at(32, 20);
+  if (bare) {
+    bodyT(0, 0, 8, 4, C.skin); B(28, 16, 8, 4, C.skinLo);
+    B(16, 20, 4, 12, C.skinLo); B(28, 20, 4, 12, C.skinLo);
+    bodyF(0, 0, 8, 12, C.skin);
+    grit(20, 20, 8, 12, C.skinHi, 40);
+    bodyF(0, 0, 8, 1.2, C.skinHi);                                     // collarbones
+    bodyF(3.9, 2.2, 0.25, 6, C.skinLo);                                // centre line
+    bodyF(1.4, 2.4, 1.1, 0.5, C.skinDeep); bodyF(5.5, 2.4, 1.1, 0.5, C.skinDeep);
+    bodyF(0, 10.8, 8, 1.2, C.skinLo);
+    bodyB(0, 0, 8, 12, C.skinLo); grit(32, 20, 8, 12, C.skin, 40);
+  } else {
   bodyT(0, 0, 8, 4, C.hood); B(28, 16, 8, 4, C.hoodLo);
   B(16, 20, 4, 12, C.hoodLo); B(28, 20, 4, 12, C.hoodLo);              // sides
   bodyF(0, 0, 8, 12, C.hood);
@@ -409,9 +419,18 @@ function diorSkin() {
   /* overlay: the hood bunched behind the neck */
   B(20, 32, 8, 3.2, C.hoodHi); grit(20, 32, 8, 3.2, C.hood, 70);
   B(36, 36, 8, 3.4, C.hoodLo);
+  }
 
   /* ================= arms ================= */
   const arm = (u, v) => {
+    if (bare) {
+      B(u + 4, v, 4, 4, C.skin); B(u + 8, v, 4, 4, C.skin);
+      [0, 4, 8, 12].forEach((o) => {
+        B(u + o, v + 4, 4, 12, o === 0 || o === 8 ? C.skinLo : C.skin);
+        grit(u + o, v + 4, 4, 12, C.skinHi, 20);
+      });
+      return;
+    }
     B(u + 4, v, 4, 4, C.hood); B(u + 8, v, 4, 4, C.skin);              // shoulder / palm
     [0, 4, 8, 12].forEach((o) => {
       B(u + o, v + 4, 4, 7.4, o === 0 || o === 8 ? C.hoodLo : C.hood);
@@ -426,6 +445,16 @@ function diorSkin() {
 
   /* ================= jeans + boots ================= */
   const leg = (u, v) => {
+    if (bare) {
+      B(u + 4, v, 4, 4, '#e8e8e4'); B(u + 8, v, 4, 4, C.skinLo);
+      [0, 4, 8, 12].forEach((o) => {
+        B(u + o, v + 4, 4, 12, o === 0 || o === 8 ? C.skinLo : C.skin);
+        grit(u + o, v + 6, 4, 10, C.skinHi, 16);
+        B(u + o, v + 4, 4, 4.6, '#eeeeea');                            // boxers
+        B(u + o, v + 4, 4, 0.7, '#d4d4cf');                            // waistband
+      });
+      return;
+    }
     B(u + 4, v, 4, 4, C.denim); B(u + 8, v, 4, 4, C.bootLo);
     [[0, C.denimLo], [4, C.denim], [8, C.denimLo], [12, C.denimLo]].forEach(([o, col]) => {
       B(u + o, v + 4, 4, 12, col);
@@ -513,9 +542,20 @@ function laptop() {
   return g;
 }
 
+const SWAPPABLE = ['body', 'armL', 'armR', 'legL', 'legR'];
+
 function diorHero() {
-  const g = skinnedSteve(diorSkin(), SKIN_S);
+  const g = skinnedSteve(diorSkin(false), SKIN_S);
   const u = g.userData;
+
+  /* a second, undressed set of materials, swapped in on click */
+  const bareAtlas = diorSkin(true);
+  const bareMats = {}, dressedMats = {};
+  SWAPPABLE.forEach((k) => {
+    const p = SKIN_PARTS[k];
+    bareMats[k] = atlasBox(bareAtlas, p.base[0], p.base[1], p.size[0], p.size[1], p.size[2], false, SKIN_S);
+    dressedMats[k] = u.parts[k].userData.base.material;
+  });
   u.restL = -0.73; u.restR = -0.73;
   u.armL.rotation.x = u.restL;
   u.armR.rotation.x = u.restR;
@@ -523,6 +563,21 @@ function diorHero() {
   lap.position.set(0, 14.4 * P, 8 * P);
   lap.rotation.set(-0.10, 0, 0);
   g.add(lap);
+
+  /* 0 fully kitted, 1 laptop down, 2 hoodie off, 3 jeans off, then back */
+  u.stage = 0;
+  u.setStage = (n) => {
+    u.stage = ((n % 4) + 4) % 4;
+    lap.visible = u.stage === 0;
+    const topOff = u.stage >= 2, legsOff = u.stage >= 3;
+    SWAPPABLE.forEach((k) => {
+      const off = k === 'legL' || k === 'legR' ? legsOff : topOff;
+      u.parts[k].userData.base.material = off ? bareMats[k] : dressedMats[k];
+      u.parts[k].userData.over.visible = !off;
+    });
+    u.restL = u.stage === 0 ? -0.73 : -0.06;      // arms drop once the laptop is gone
+    u.restR = u.stage === 0 ? -0.73 : -0.06;
+  };
   return g;
 }
 
@@ -624,7 +679,9 @@ let spin = 0, spinV = 0, dragging = false, lastX = 0;
 let mouse = { x: 0, y: 0 };
 const grab = document.getElementById('grab');
 
+let pressAt = 0, pressX = 0, pressY = 0;
 grab.addEventListener('pointerdown', (e) => {
+  pressAt = performance.now(); pressX = e.clientX; pressY = e.clientY;
   dragging = true; lastX = e.clientX;
   grab.setPointerCapture(e.pointerId);
   grab.classList.add('grabbing');
@@ -636,6 +693,12 @@ grab.addEventListener('pointermove', (e) => {
 });
 const release = (e) => {
   if (!dragging) return;
+  /* a tap, not a drag: let him take something off */
+  if (e && performance.now() - pressAt < 420 &&
+      Math.abs(e.clientX - pressX) < 6 && Math.abs(e.clientY - pressY) < 6 &&
+      current && current.userData.setStage) {
+    current.userData.setStage(current.userData.stage + 1);
+  }
   dragging = false;
   grab.classList.remove('grabbing');
   if (e && e.pointerId != null && grab.hasPointerCapture(e.pointerId)) grab.releasePointerCapture(e.pointerId);
@@ -652,6 +715,8 @@ const sections = [...document.querySelectorAll('[data-cast]')];
 const chips = [...document.querySelectorAll('.chip-pick')];
 const bg = document.getElementById('bg');
 const bg2 = document.getElementById('bg2');
+const tag = document.getElementById('tag');
+const tagAnchor = new THREE.Vector3();
 let active = 0, sideGoal = 0, sideNow = 0;
 
 function setActive(i) {
@@ -865,6 +930,17 @@ function frame(now) {
     });
   });
 
+  /* the nameplate hovers over his head until you take the hint */
+  if (tag) {
+    const show = current && current.userData.setStage && current.userData.stage === 0;
+    tag.classList.toggle('on', !!show);
+    if (show) {
+      tagAnchor.set(rig.position.x, 2.28, 0).project(camera);
+      tag.style.left = ((tagAnchor.x * 0.5 + 0.5) * innerWidth).toFixed(1) + 'px';
+      tag.style.top = ((-tagAnchor.y * 0.5 + 0.5) * innerHeight).toFixed(1) + 'px';
+    }
+  }
+
   /* background parallax */
   {
     const p = scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight);
@@ -953,6 +1029,35 @@ chips.forEach((chip, i) => {
   const c = cv.getContext('2d');
   c.imageSmoothingEnabled = false;
   CHIP_FACES[i](c);
+});
+
+/* little pixel marks for the contact buttons */
+const ICONS = {
+  telegram: (c) => {
+    c.fillStyle = '#5fc8f0';
+    c.fillRect(2, 7, 12, 2); c.fillRect(4, 5, 10, 2); c.fillRect(6, 3, 8, 2);
+    c.fillRect(8, 9, 6, 2); c.fillRect(9, 11, 4, 2);
+    c.fillStyle = '#9fe4ff'; c.fillRect(6, 9, 2, 4);
+  },
+  whatsapp: (c) => {
+    c.fillStyle = '#4fd06a';
+    c.fillRect(3, 2, 10, 9); c.fillRect(2, 3, 12, 7); c.fillRect(4, 11, 4, 2); c.fillRect(3, 13, 2, 2);
+    c.fillStyle = '#0f2a17';
+    c.fillRect(5, 4, 2, 3); c.fillRect(9, 6, 2, 3); c.fillRect(7, 6, 2, 2);
+  },
+  linkedin: (c) => {
+    c.fillStyle = '#3f9ad6'; c.fillRect(1, 1, 14, 14);
+    c.fillStyle = '#ffffff';
+    c.fillRect(3, 6, 2, 7); c.fillRect(3, 3, 2, 2);
+    c.fillRect(7, 6, 2, 7); c.fillRect(9, 6, 3, 2); c.fillRect(11, 8, 2, 5);
+  }
+};
+document.querySelectorAll('canvas[data-icon]').forEach((cv) => {
+  const paint = ICONS[cv.dataset.icon];
+  if (!paint) return;
+  const c = cv.getContext('2d');
+  c.imageSmoothingEnabled = false;
+  paint(c);
 });
 
 const hint = document.getElementById('hint');

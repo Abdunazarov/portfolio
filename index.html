@@ -74,7 +74,7 @@ body{
 @keyframes load{to{width:100%}}
 
 /* ---------- sections ---------- */
-#track{position:relative; z-index:4}
+#track{position:relative; z-index:4; pointer-events:none}
 section{
   min-height:100svh; display:flex; align-items:center;
   padding:clamp(3.5rem,8vh,6rem) 0 clamp(6rem,10vh,8rem);
@@ -84,12 +84,11 @@ section{
   background:var(--gui);
   border:2px solid rgba(0,0,0,.7);
   box-shadow:inset 2px 2px 0 var(--edge-lt), inset -2px -2px 0 var(--edge-dk), 0 14px 0 rgba(0,0,0,.26);
-  padding:clamp(1.3rem,2.4vw,2rem);
+  padding:clamp(1.1rem,1.9vw,1.55rem);
   backdrop-filter:blur(3px);
-  display:flex; flex-direction:column; gap:.95rem;
-  max-width:34rem; position:relative;
-  /* a section is always exactly one screen; a long card scrolls inside itself */
-  max-height:74svh; overflow-y:auto; scrollbar-width:thin;
+  display:flex; flex-direction:column; gap:.72rem;
+  max-width:33rem; position:relative;
+  pointer-events:auto;   /* only the card itself takes clicks; the rest reaches the character */
 }
 .facts{
   display:flex; flex-wrap:wrap; gap:.3rem 1.15rem;
@@ -110,39 +109,41 @@ section{
 
 h1,h2{margin:0; text-wrap:balance; font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; letter-spacing:-.02em}
 h1{font-size:clamp(2.2rem,4.4vw,3.6rem); line-height:1.02}
-h2{font-size:clamp(1.9rem,3.6vw,2.9rem); line-height:1.02}
+h2{font-size:clamp(1.7rem,2.9vw,2.3rem); line-height:1.04}
 p{margin:0}
 .kicker{
-  font-family:"Pixelify Sans",monospace; font-size:.95rem; letter-spacing:.08em;
+  font-family:"Pixelify Sans",monospace; font-size:.86rem; letter-spacing:.07em;
   color:var(--tint); text-shadow:1px 1px 0 rgba(0,0,0,.6);
 }
-.lead{color:var(--dim); font-size:clamp(1rem,1.25vw,1.12rem)}
-.meta{font-family:"Pixelify Sans",monospace; font-size:.9rem; color:var(--faint)}
-.bul{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:.5rem}
-.bul li{display:grid; grid-template-columns:9px 1fr; gap:.7rem; color:var(--dim); font-size:.94rem; line-height:1.5}
+.lead{color:var(--dim); font-size:clamp(.94rem,1.05vw,1.02rem); line-height:1.55}
+.meta{font-family:"Pixelify Sans",monospace; font-size:.84rem; color:var(--faint)}
+.bul{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:.4rem}
+.bul li{display:grid; grid-template-columns:8px 1fr; gap:.6rem; color:var(--dim); font-size:.88rem; line-height:1.46}
 .bul i{width:8px; height:8px; margin-top:.5rem; background:var(--tint)}
 .tags{display:flex; flex-wrap:wrap; gap:.32rem}
 .tag{
-  font-family:"Pixelify Sans",monospace; font-size:.8rem; padding:.18rem .5rem; color:var(--dim);
+  font-family:"Pixelify Sans",monospace; font-size:.74rem; padding:.14rem .45rem; color:var(--dim);
   background:rgba(255,255,255,.08);
   box-shadow:inset 1px 1px 0 rgba(255,255,255,.14), inset -1px -1px 0 rgba(0,0,0,.4);
 }
 .stat{
-  display:flex; align-items:center; gap:.75rem; padding:.6rem .75rem;
+  display:flex; align-items:center; gap:.65rem; padding:.45rem .65rem;
   background:rgba(6,9,8,.72); border:2px solid var(--tint);
 }
-.stat b{font-family:"Bricolage Grotesque",sans-serif; font-size:1.3rem; line-height:1}
+.stat b{font-family:"Bricolage Grotesque",sans-serif; font-size:1.15rem; line-height:1}
 .stat span{font-family:"Pixelify Sans",monospace; font-size:.78rem; color:var(--tint); letter-spacing:.1em; text-transform:uppercase}
 
-.btns{display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.25rem}
+.btns{display:flex; flex-wrap:wrap; gap:.45rem; margin-top:.25rem}
 .btn{
-  display:inline-block; padding:.62rem 1.25rem; text-decoration:none; color:var(--ink); cursor:pointer;
-  font-family:"Pixelify Sans",monospace; font-size:1.05rem;
+  display:inline-block; padding:.5rem 1rem; text-decoration:none; color:var(--ink); cursor:pointer;
+  font-family:"Pixelify Sans",monospace; font-size:1rem;
   background:#5f6a63; border:2px solid rgba(0,0,0,.75);
   box-shadow:inset 2px 2px 0 rgba(255,255,255,.26), inset -2px -2px 0 rgba(0,0,0,.5);
 }
 .btn:hover,.btn:focus-visible{background:#74847a; outline:none}
 .btn:focus-visible{box-shadow:inset 2px 2px 0 rgba(255,255,255,.26), 0 0 0 3px var(--tint)}
+.btn{display:inline-flex; align-items:center; gap:.5rem}
+.ico{width:1.15em; height:1.15em; image-rendering:pixelated; flex:none}
 .btn.pri{background:#3f7d4e}
 .btn.pri:hover{background:#4d9660}
 
@@ -179,6 +180,19 @@ p{margin:0}
 }
 .chip-pick.on b,.chip-pick:hover b{opacity:1}
 
+#tag{
+  position:fixed; z-index:9; transform:translate(-50%,-100%);
+  pointer-events:none; white-space:nowrap;
+  font-family:"Pixelify Sans",monospace; font-size:.88rem; color:#fff;
+  background:rgba(8,11,10,.55); padding:.1rem .5rem;
+  text-shadow:1px 1px 0 rgba(0,0,0,.75);
+  opacity:0; transition:opacity .4s;
+  animation:tagbob 1.9s ease-in-out infinite alternate;
+}
+#tag.on{opacity:1}
+@keyframes tagbob{from{margin-top:0}to{margin-top:-6px}}
+@media (prefers-reduced-motion:reduce){ #tag{animation:none} }
+
 #hint{
   position:fixed; left:50%; bottom:clamp(6.6rem,12vh,7.8rem); transform:translateX(-50%); z-index:10;
   font-family:"Pixelify Sans",monospace; font-size:.85rem; color:#fff;
@@ -191,15 +205,28 @@ p{margin:0}
   section{align-items:flex-end; min-height:100svh; padding:0 0 7.5rem}
   /* the character owns the top of the screen; the card is capped and scrolls */
   .card{
-    background:rgba(13,17,15,.9); max-height:56svh; overflow-y:auto; gap:.7rem;
-    padding:1.1rem 1.1rem 1.2rem;
+    background:rgba(13,17,15,.9); max-height:56svh; overflow-y:auto; gap:.62rem;
+    padding:1rem 1rem 1.1rem;
   }
   h1{font-size:clamp(2rem,10vw,2.9rem)}
   h2{font-size:clamp(1.5rem,7vw,2rem)}
   .lead{font-size:.95rem}
   .bul li{font-size:.88rem}
   #grab{top:0; bottom:56svh}
-  #hint{bottom:calc(56svh + 4.6rem)}
+  #tag{
+  position:fixed; z-index:9; transform:translate(-50%,-100%);
+  pointer-events:none; white-space:nowrap;
+  font-family:"Pixelify Sans",monospace; font-size:.88rem; color:#fff;
+  background:rgba(8,11,10,.55); padding:.1rem .5rem;
+  text-shadow:1px 1px 0 rgba(0,0,0,.75);
+  opacity:0; transition:opacity .4s;
+  animation:tagbob 1.9s ease-in-out infinite alternate;
+}
+#tag.on{opacity:1}
+@keyframes tagbob{from{margin-top:0}to{margin-top:-6px}}
+@media (prefers-reduced-motion:reduce){ #tag{animation:none} }
+
+#hint{bottom:calc(56svh + 4.6rem)}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -233,7 +260,7 @@ p{margin:0}
         <div class="facts">
           <span>Based in <b>Kuala Lumpur</b></span>
           <span><b>4 years</b> in production</span>
-          <span><b>3 countries</b>, 5 teams</span>
+          <span>Shipped with <b>5 teams</b></span>
         </div>
         <div class="btns">
           <a class="btn pri" href="#gigwave">See the work</a>
@@ -347,11 +374,11 @@ p{margin:0}
       <div class="card">
         <span class="kicker">Spawn point</span>
         <h2>Let&rsquo;s build something</h2>
-        <p class="lead">Telegram is the fastest way to reach me. The others work too.</p>
+        <p class="lead">Three portals, same destination. Step through whichever one you like.</p>
         <div class="btns">
-          <a class="btn pri" href="https://t.me/D_Abdunazarov" target="_blank" rel="noopener">Telegram</a>
-          <a class="btn" href="https://wa.me/+601153770330" target="_blank" rel="noopener">WhatsApp</a>
-          <a class="btn" href="https://www.linkedin.com/in/dior-abdunazarov-a06aa7209/" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="btn pri" href="https://t.me/D_Abdunazarov" target="_blank" rel="noopener"><canvas class="ico" width="16" height="16" data-icon="telegram"></canvas>Telegram</a>
+          <a class="btn" href="https://wa.me/+601153770330" target="_blank" rel="noopener"><canvas class="ico" width="16" height="16" data-icon="whatsapp"></canvas>WhatsApp</a>
+          <a class="btn" href="https://www.linkedin.com/in/dior-abdunazarov-a06aa7209/" target="_blank" rel="noopener"><canvas class="ico" width="16" height="16" data-icon="linkedin"></canvas>LinkedIn</a>
         </div>
       </div>
     </div>
@@ -359,7 +386,8 @@ p{margin:0}
 
 </div>
 
-<div id="hint">drag to turn the character</div>
+<div id="tag">click me</div>
+<div id="hint">drag to turn &middot; click to undress</div>
 
 <div id="pick">
   <button class="chip-pick on" aria-label="Dior"><canvas width="8" height="8"></canvas><b>Dior</b></button>
