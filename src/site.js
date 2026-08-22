@@ -586,9 +586,9 @@ const hero = () => (ATLAS_IMG ? skinnedSteve(ATLAS_IMG) : diorHero());
 
 const CAST = [
   { id: 'steve', make: hero, label: 'Dior', scale: 1, lookDown: 0.26 },
-  { id: 'allay', make: allay, label: 'GigWave', scale: 1.7, lift: 0.66 },
+  { id: 'allay', make: allay, label: 'GigWave', scale: 1.62, lift: 0.42 },
   { id: 'golem', make: golem, label: 'Cifragen', scale: 0.86 },
-  { id: 'villager', make: villager, label: 'NAPA', scale: 1 },
+  { id: 'villager', make: villager, label: 'NAPA', scale: 1, lift: 0.14 },
   { id: 'enderman', make: enderman, label: 'Starpets', scale: 0.86 },
   { id: 'creeper', make: creeper, label: 'Gabumas', scale: 1.1 }
 ];
@@ -858,8 +858,8 @@ const NARROW = () => innerWidth < 900;
 function applyView() {
   camera.aspect = innerWidth / innerHeight;
   if (NARROW()) {
-    camera.position.set(0, 2.3, 12.2);
-    camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * 0.19, innerWidth, innerHeight);
+    camera.position.set(0, 2.3, 11.4);
+    camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * 0.24, innerWidth, innerHeight);
   } else {
     camera.position.set(0, 2.15, 9.6);
     camera.clearViewOffset();
@@ -881,7 +881,6 @@ function frame(now) {
   sideNow += (sideGoal - sideNow) * k;
   const offset = NARROW() ? 0 : 1.45;
   rig.position.x = sideNow * offset;
-  rig.scale.setScalar(NARROW() ? 0.86 : 1);
   floor.position.x = rig.position.x;
   key.target.position.set(rig.position.x, 1, 0);
   key.position.set(rig.position.x - 4.5, 6, 4);
@@ -933,7 +932,7 @@ function frame(now) {
 
   /* the nameplate hovers over his head until you take the hint */
   if (tag) {
-    const show = current && current.userData.setStage && current.userData.stage === 0;
+    const show = !!(current && current.userData.setStage);
     tag.classList.toggle('on', !!show);
     if (show) {
       tagAnchor.set(rig.position.x, 2.28, 0).project(camera);
