@@ -201,6 +201,10 @@ p{margin:0}
 
 @media (max-width:900px){
   .wrap{grid-template-columns:1fr; width:calc(100% - 1.6rem)}
+  /* contacts line up: one wide, then two abreast */
+  .btns.stack{display:grid; grid-template-columns:1fr 1fr; gap:.45rem}
+  .btns.stack > :first-child{grid-column:1 / -1}
+  .btns.stack .btn{width:100%; justify-content:center}
   .on-left .card,.on-right .card{grid-column:1; justify-self:stretch; max-width:none}
   section{align-items:flex-end; min-height:100svh; padding:0 0 7.5rem}
   /* the character owns the top of the screen; the card is capped and scrolls */
@@ -375,7 +379,7 @@ p{margin:0}
         <span class="kicker">Spawn point</span>
         <h2>Let&rsquo;s build something</h2>
         <p class="lead">Three portals, same destination. Step through whichever one you like.</p>
-        <div class="btns">
+        <div class="btns stack">
           <a class="btn pri" href="https://t.me/D_Abdunazarov" target="_blank" rel="noopener"><canvas class="ico" width="16" height="16" data-icon="telegram"></canvas>Telegram</a>
           <a class="btn" href="https://wa.me/+601153770330" target="_blank" rel="noopener"><canvas class="ico" width="16" height="16" data-icon="whatsapp"></canvas>WhatsApp</a>
           <a class="btn" href="https://www.linkedin.com/in/dior-abdunazarov-a06aa7209/" target="_blank" rel="noopener"><canvas class="ico" width="16" height="16" data-icon="linkedin"></canvas>LinkedIn</a>
