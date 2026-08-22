@@ -492,7 +492,7 @@ function laptop() {
   const lid = part(13, 7.6, 0.7, [edge, edge, edge, edge, mapped(sc), shell], 0, 0, 0, [0, 3.8, 0]);
   lidG.add(lid);
   lidG.position.set(0, 0.5 * P, -3.9 * P);
-  lidG.rotation.x = -0.2;
+  lidG.rotation.x = -0.46;
   g.add(base, lidG);
   g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   return g;
@@ -501,12 +501,12 @@ function laptop() {
 function diorHero() {
   const g = skinnedSteve(diorSkin(), SKIN_S);
   const u = g.userData;
-  u.restL = -0.94; u.restR = -0.88;
+  u.restL = -0.93; u.restR = -0.93;
   u.armL.rotation.x = u.restL;
   u.armR.rotation.x = u.restR;
   const lap = laptop();
-  lap.position.set(-2.6 * P, 15.2 * P, 7.8 * P);
-  lap.rotation.set(-0.12, 0.42, 0.05);
+  lap.position.set(0, 16.1 * P, 9.5 * P);
+  lap.rotation.set(-0.10, 0, 0);
   g.add(lap);
   return g;
 }
@@ -641,12 +641,69 @@ let active = 0, sideGoal = 0, sideNow = 0;
 function setActive(i) {
   if (i === active) return;
   active = i;
+  if (performance.now() >= navLock) navIndex = i;
   const s = sections[i];
   mount(s.dataset.cast);
   sideGoal = s.dataset.side === 'left' ? -1 : 1;
   document.documentElement.style.setProperty('--tint', s.dataset.tint || '#7be05b');
   chips.forEach((c, k) => c.classList.toggle('on', k === i));
 }
+
+
+/* ---------------------------------------------------------------------
+   One notch of the wheel, one swipe, or one arrow key moves exactly one
+   section — so the character and his card are always framed together.
+   Scrolling inside a card (the phone layout) is left alone.
+   --------------------------------------------------------------------- */
+let navIndex = 0, navLock = 0;
+
+function goTo(i) {
+  i = Math.max(0, Math.min(sections.length - 1, i));
+  if (i === navIndex && performance.now() < navLock) return;
+  navIndex = i;
+  navLock = performance.now() + 720;
+  sections[i].scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+}
+
+/* true when the pointer is over a card that still has room to scroll itself */
+function insideScrollingCard(target, dir) {
+  const card = target && target.closest ? target.closest('.card') : null;
+  if (!card || card.scrollHeight <= card.clientHeight + 2) return false;
+  const atTop = card.scrollTop <= 0;
+  const atEnd = card.scrollTop + card.clientHeight >= card.scrollHeight - 1;
+  return dir > 0 ? !atEnd : !atTop;
+}
+
+addEventListener('wheel', (e) => {
+  if (Math.abs(e.deltaY) < 4) return;
+  const dir = e.deltaY > 0 ? 1 : -1;
+  if (insideScrollingCard(e.target, dir)) return;
+  e.preventDefault();
+  if (performance.now() < navLock) return;
+  goTo(navIndex + dir);
+}, { passive: false });
+
+let touchStart = null;
+addEventListener('touchstart', (e) => { touchStart = e.touches[0].clientY; }, { passive: true });
+addEventListener('touchend', (e) => {
+  if (touchStart == null) return;
+  const dy = touchStart - e.changedTouches[0].clientY;
+  touchStart = null;
+  if (Math.abs(dy) < 44) return;
+  const dir = dy > 0 ? 1 : -1;
+  if (insideScrollingCard(e.target, dir)) return;
+  if (performance.now() < navLock) return;
+  goTo(navIndex + dir);
+}, { passive: true });
+
+addEventListener('keydown', (e) => {
+  if (e.target.closest && e.target.closest('#pick')) return;      // the picker owns its arrows
+  const next = ['ArrowDown', 'PageDown', ' '].includes(e.key);
+  const prev = ['ArrowUp', 'PageUp'].includes(e.key);
+  if (!next && !prev) return;
+  e.preventDefault();
+  goTo(navIndex + (next ? 1 : -1));
+});
 
 const io = new IntersectionObserver((es) => {
   es.forEach((e) => {
@@ -662,9 +719,7 @@ document.getElementById('pick').addEventListener('keydown', (e) => {
   const i = Math.max(0, Math.min(chips.length - 1, chips.indexOf(document.activeElement) + d));
   chips[i].focus(); chips[i].click();
 });
-chips.forEach((c, i) => c.addEventListener('click', () => {
-  sections[i].scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
-}));
+chips.forEach((c, i) => c.addEventListener('click', () => goTo(i)));
 
 const NARROW = () => innerWidth < 900;
 function applyView() {
