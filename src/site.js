@@ -479,6 +479,17 @@ function keyboardTex() {
   g.fillStyle = '#a8aeb6'; g.fillRect(38, 52, 36, 14);
   return c;
 }
+function lidBackTex() {
+  const c = document.createElement('canvas');
+  c.width = 104; c.height = 61;
+  const g = c.getContext('2d');
+  g.fillStyle = '#b7bcc3'; g.fillRect(0, 0, 104, 61);
+  g.fillStyle = '#a3a8b0'; g.fillRect(0, 0, 104, 3); g.fillRect(0, 58, 104, 3);
+  g.fillStyle = '#8d939b'; g.fillRect(44, 24, 16, 13);      // a little badge
+  g.fillStyle = '#c6cad0'; g.fillRect(47, 27, 10, 7);
+  return c;
+}
+
 function laptop() {
   const g = new THREE.Group();
   const shell = solid('#b7bcc3'), edge = solid('#9aa0a8');
@@ -488,11 +499,15 @@ function laptop() {
   sc.magFilter = THREE.NearestFilter; sc.colorSpace = THREE.SRGBColorSpace;
 
   const base = part(13, 1, 8.5, [shell, shell, mapped(kb), edge, edge, edge], 0, 0, 0);
+  const back = new THREE.CanvasTexture(lidBackTex());
+  back.magFilter = THREE.NearestFilter; back.colorSpace = THREE.SRGBColorSpace;
+  /* hinge on the far edge; the lid tips back towards him, so he reads the
+     screen and we see the outside of the lid */
   const lidG = new THREE.Group();
-  const lid = part(13, 7.6, 0.7, [edge, edge, edge, edge, mapped(sc), shell], 0, 0, 0, [0, 3.8, 0]);
+  const lid = part(13, 6.6, 0.7, [edge, edge, edge, edge, mapped(back), mapped(sc)], 0, 0, 0, [0, 3.3, 0]);
   lidG.add(lid);
-  lidG.position.set(0, 0.5 * P, -3.9 * P);
-  lidG.rotation.x = -0.46;
+  lidG.position.set(0, 0.5 * P, 3.9 * P);
+  lidG.rotation.x = -0.40;
   g.add(base, lidG);
   g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   return g;
@@ -501,11 +516,11 @@ function laptop() {
 function diorHero() {
   const g = skinnedSteve(diorSkin(), SKIN_S);
   const u = g.userData;
-  u.restL = -0.93; u.restR = -0.93;
+  u.restL = -0.73; u.restR = -0.73;
   u.armL.rotation.x = u.restL;
   u.armR.rotation.x = u.restR;
   const lap = laptop();
-  lap.position.set(0, 16.1 * P, 9.5 * P);
+  lap.position.set(0, 14.4 * P, 8 * P);
   lap.rotation.set(-0.10, 0, 0);
   g.add(lap);
   return g;
@@ -515,7 +530,7 @@ let ATLAS_IMG = null;
 const hero = () => (ATLAS_IMG ? skinnedSteve(ATLAS_IMG) : diorHero());
 
 const CAST = [
-  { id: 'steve', make: hero, label: 'Dior', scale: 1 },
+  { id: 'steve', make: hero, label: 'Dior', scale: 1, lookDown: 0.26 },
   { id: 'allay', make: allay, label: 'GigWave', scale: 1.8, lift: 0.86 },
   { id: 'golem', make: golem, label: 'Cifragen', scale: 0.86 },
   { id: 'villager', make: villager, label: 'NAPA', scale: 1 },
@@ -572,6 +587,7 @@ function mount(id) {
   const next = def.make();
   next.scale.setScalar(def.scale || 1);
   next.userData.lift = def.lift || 0;
+  next.userData.lookDown = def.lookDown || 0;
   next.traverse((o) => { if (o.isMesh) PARTS_HOME.set(o, o.position.clone()); });
 
   const old = current;
@@ -641,7 +657,7 @@ let active = 0, sideGoal = 0, sideNow = 0;
 function setActive(i) {
   if (i === active) return;
   active = i;
-  if (performance.now() >= navLock) navIndex = i;
+  if (!animating) navIndex = i;
   const s = sections[i];
   mount(s.dataset.cast);
   sideGoal = s.dataset.side === 'left' ? -1 : 1;
@@ -651,18 +667,42 @@ function setActive(i) {
 
 
 /* ---------------------------------------------------------------------
-   One notch of the wheel, one swipe, or one arrow key moves exactly one
-   section — so the character and his card are always framed together.
-   Scrolling inside a card (the phone layout) is left alone.
+   Section navigation.
+
+   The browser's own smooth scrolling and CSS scroll-snap fought each other
+   and a single trackpad flick could travel two or three sections, so the
+   page drives the scroll itself: one wheel gesture, one swipe or one arrow
+   key advances exactly one section, eased over ~0.7s. A gesture is treated
+   as continuing until the events stop arriving, which is what stops a long
+   flick from firing again mid-flight.
    --------------------------------------------------------------------- */
-let navIndex = 0, navLock = 0;
+let navIndex = 0;
+let animating = false;
+let lastGesture = 0;
+let animEnd = 0;
+
+const easeInOut = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+
+function animateTo(y, dur = 720) {
+  const from = scrollY;
+  const dist = y - from;
+  if (Math.abs(dist) < 1) return;
+  if (REDUCED) { scrollTo(0, y); return; }
+  const t0 = performance.now();
+  animating = true;
+  const step = (now) => {
+    const p = Math.min(1, (now - t0) / dur);
+    scrollTo(0, from + dist * easeInOut(p));
+    if (p < 1) requestAnimationFrame(step);
+    else { animating = false; animEnd = performance.now(); }
+  };
+  requestAnimationFrame(step);
+}
 
 function goTo(i) {
   i = Math.max(0, Math.min(sections.length - 1, i));
-  if (i === navIndex && performance.now() < navLock) return;
   navIndex = i;
-  navLock = performance.now() + 720;
-  sections[i].scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+  animateTo(sections[i].offsetTop);
 }
 
 /* true when the pointer is over a card that still has room to scroll itself */
@@ -674,36 +714,64 @@ function insideScrollingCard(target, dir) {
   return dir > 0 ? !atEnd : !atTop;
 }
 
-addEventListener('wheel', (e) => {
-  if (Math.abs(e.deltaY) < 4) return;
-  const dir = e.deltaY > 0 ? 1 : -1;
-  if (insideScrollingCard(e.target, dir)) return;
-  e.preventDefault();
-  if (performance.now() < navLock) return;
+/* one continuous gesture only ever advances one section */
+function gesture(dir, target) {
+  const now = performance.now();
+  const quiet = now - lastGesture > 160;
+  lastGesture = now;
+  /* still animating, still coasting from the last one, or still the same
+     flick — all of them mean this is not a new gesture */
+  if (animating || now - animEnd < 280 || !quiet) return false;
+  if (insideScrollingCard(target, dir)) return false;
   goTo(navIndex + dir);
+  return true;
+}
+
+addEventListener('wheel', (e) => {
+  const dir = e.deltaY > 0 ? 1 : -1;
+  if (insideScrollingCard(e.target, dir)) return;       // let the card scroll
+  e.preventDefault();                                    // the page never free-scrolls
+  if (Math.abs(e.deltaY) < 3) return;
+  gesture(dir, e.target);
 }, { passive: false });
 
-let touchStart = null;
-addEventListener('touchstart', (e) => { touchStart = e.touches[0].clientY; }, { passive: true });
+let touchY = null;
+addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+addEventListener('touchmove', (e) => {
+  if (touchY == null) return;
+  const dir = touchY - e.touches[0].clientY > 0 ? 1 : -1;
+  if (!insideScrollingCard(e.target, dir)) e.preventDefault();
+}, { passive: false });
 addEventListener('touchend', (e) => {
-  if (touchStart == null) return;
-  const dy = touchStart - e.changedTouches[0].clientY;
-  touchStart = null;
-  if (Math.abs(dy) < 44) return;
-  const dir = dy > 0 ? 1 : -1;
-  if (insideScrollingCard(e.target, dir)) return;
-  if (performance.now() < navLock) return;
-  goTo(navIndex + dir);
+  if (touchY == null) return;
+  const dy = touchY - e.changedTouches[0].clientY;
+  touchY = null;
+  if (Math.abs(dy) < 40) return;
+  lastGesture = 0; animEnd = 0;                          // a swipe is always a fresh gesture
+  gesture(dy > 0 ? 1 : -1, e.target);
 }, { passive: true });
 
 addEventListener('keydown', (e) => {
-  if (e.target.closest && e.target.closest('#pick')) return;      // the picker owns its arrows
+  if (e.target.closest && e.target.closest('#pick')) return;   // the picker owns its arrows
   const next = ['ArrowDown', 'PageDown', ' '].includes(e.key);
   const prev = ['ArrowUp', 'PageUp'].includes(e.key);
   if (!next && !prev) return;
   e.preventDefault();
-  goTo(navIndex + (next ? 1 : -1));
+  if (!animating) goTo(navIndex + (next ? 1 : -1));
 });
+
+/* in-page links go through the same animation */
+addEventListener('click', (e) => {
+  const a = e.target.closest && e.target.closest('a[href^="#"]');
+  if (!a) return;
+  const el = document.querySelector(a.getAttribute('href'));
+  const i = sections.indexOf(el);
+  if (i < 0) return;
+  e.preventDefault();
+  goTo(i);
+});
+
+addEventListener('resize', () => { if (!animating) scrollTo(0, sections[navIndex].offsetTop); });
 
 const io = new IntersectionObserver((es) => {
   es.forEach((e) => {
@@ -766,7 +834,7 @@ function frame(now) {
     /* head follows the cursor, in the character's own frame */
     if (u.head) {
       u.head.rotation.y += ((-mouse.x * 0.6 - spin) - u.head.rotation.y) * k;
-      u.head.rotation.x += ((mouse.y * 0.34) - u.head.rotation.x) * k;
+      u.head.rotation.x += ((mouse.y * 0.30 + (u.lookDown || 0)) - u.head.rotation.x) * k;
     }
     if (!REDUCED) {
       if (u.armL) u.armL.rotation.x = (u.restL || 0) + Math.sin(t * 1.6) * 0.05;
