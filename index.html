@@ -182,6 +182,7 @@ p{margin:0}
 }
 .chip-pick.on b,.chip-pick:hover b{opacity:1}
 
+/* ---------- floating nameplate ---------- */
 #tag{
   position:fixed; z-index:9; transform:translate(-50%,-100%);
   pointer-events:none; white-space:nowrap;
@@ -193,7 +194,6 @@ p{margin:0}
 }
 #tag.on{opacity:1}
 @keyframes tagbob{from{margin-top:0}to{margin-top:-6px}}
-@media (prefers-reduced-motion:reduce){ #tag{animation:none} }
 
 #hint{
   position:fixed; left:50%; bottom:clamp(6.6rem,12vh,7.8rem); transform:translateX(-50%); z-index:10;
@@ -208,35 +208,38 @@ p{margin:0}
   .btns.stack > :first-child{grid-column:1 / -1}
   .btns.stack .btn{width:100%; justify-content:center}
   .on-left .card,.on-right .card{grid-column:1; justify-self:stretch; max-width:none}
-  section{align-items:flex-end; min-height:100svh; padding:0 0 7.5rem}
-  /* the character owns the top of the screen; the card is capped and scrolls */
+  section{align-items:flex-end; min-height:100svh; padding:0 0 6.2rem}
+  /* the card takes what it needs, but never so much that the character has
+     nowhere to stand — 190px is always left for him, on any screen */
   .card{
-    background:rgba(13,17,15,.9); max-height:56svh; overflow-y:auto; gap:.62rem;
-    padding:1rem 1rem 1.1rem;
+    background:rgba(13,17,15,.9); gap:.6rem; padding:1rem 1rem 1.1rem;
+    max-height:min(58svh, calc(100svh - 6.2rem - 190px));
+    overflow-y:auto; overscroll-behavior:contain;
   }
+  .facts{gap:.1rem .8rem; font-size:.82rem}
   h1{font-size:clamp(2rem,10vw,2.9rem)}
   h2{font-size:clamp(1.5rem,7vw,2rem)}
   .lead{font-size:.95rem}
   .bul li{font-size:.88rem}
-  #grab{top:0; bottom:56svh}
-  #tag{
-  position:fixed; z-index:9; transform:translate(-50%,-100%);
-  pointer-events:none; white-space:nowrap;
-  font-family:"Pixelify Sans",monospace; font-size:.88rem; color:#fff;
-  background:rgba(8,11,10,.55); padding:.1rem .5rem;
-  text-shadow:1px 1px 0 rgba(0,0,0,.75);
-  opacity:0; transition:opacity .4s;
-  animation:tagbob 1.9s ease-in-out infinite alternate;
+  /* the grab area covers exactly the gap the character stands in */
+  #grab{top:0; height:var(--char-space, 42svh); bottom:auto}
+  #hint{display:none}
 }
-#tag.on{opacity:1}
-@keyframes tagbob{from{margin-top:0}to{margin-top:-6px}}
-@media (prefers-reduced-motion:reduce){ #tag{animation:none} }
 
-#hint{bottom:calc(56svh + 4.6rem)}
+/* short screens: shrink the hotbar so it stops eating the card */
+@media (max-height:720px){
+  .chip-pick{width:clamp(36px,10.5vw,44px)}
+  #pick{bottom:.55rem; gap:.3rem; padding:.3rem}
+  section{padding-bottom:5.2rem}
+  .card{max-height:min(60svh, calc(100svh - 5.2rem - 175px))}
+  h1{font-size:clamp(1.8rem,8.5vw,2.4rem)}
+  .lead{font-size:.9rem}
 }
+
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   #bg{transform:scale(1.02)}
+  #tag{animation:none}
 }
 </style>
 </head>

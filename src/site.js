@@ -585,11 +585,11 @@ let ATLAS_IMG = null;
 const hero = () => (ATLAS_IMG ? skinnedSteve(ATLAS_IMG) : diorHero());
 
 const CAST = [
-  { id: 'steve', make: hero, label: 'Dior', scale: 1, lookDown: 0.26 },
-  { id: 'allay', make: allay, label: 'GigWave', scale: 1.62, lift: 0.42 },
-  { id: 'golem', make: golem, label: 'Cifragen', scale: 0.86 },
-  { id: 'villager', make: villager, label: 'NAPA', scale: 1, lift: 0.14 },
-  { id: 'enderman', make: enderman, label: 'Starpets', scale: 0.86 },
+  { id: 'steve', make: hero, label: 'Dior', scale: 1, lookDown: 0.26, h: 2.0 },
+  { id: 'allay', make: allay, label: 'GigWave', scale: 1.62, lift: 0.42, h: 1.0 },
+  { id: 'golem', make: golem, label: 'Cifragen', scale: 0.86, h: 2.69 },
+  { id: 'villager', make: villager, label: 'NAPA', scale: 1, lift: 0.14, h: 2.125 },
+  { id: 'enderman', make: enderman, label: 'Starpets', scale: 0.86, h: 2.875 },
   { id: 'creeper', make: creeper, label: 'Gabumas', scale: 1.1 }
 ];
 
@@ -643,6 +643,8 @@ function mount(id) {
   next.scale.setScalar(def.scale || 1);
   next.userData.lift = def.lift || 0;
   next.userData.lookDown = def.lookDown || 0;
+  next.userData.tall = (def.h || 2) * (def.scale || 1) + (def.lift || 0);
+  frameCharacter();
   next.traverse((o) => { if (o.isMesh) PARTS_HOME.set(o, o.position.clone()); });
 
   const old = current;
@@ -728,6 +730,7 @@ function setActive(i) {
   sideGoal = s.dataset.side === 'left' ? -1 : 1;
   document.documentElement.style.setProperty('--tint', s.dataset.tint || '#7be05b');
   chips.forEach((c, k) => c.classList.toggle('on', k === i));
+  frameCharacter();
 }
 
 
@@ -855,20 +858,45 @@ document.getElementById('pick').addEventListener('keydown', (e) => {
 chips.forEach((c, i) => c.addEventListener('click', () => goTo(i)));
 
 const NARROW = () => innerWidth < 900;
-function applyView() {
+const TAN_HALF_FOV = Math.tan((30 / 2) * Math.PI / 180);
+
+/* How much room is left above the card on a phone. Measured, not assumed —
+   a 667px screen and a 932px screen leave very different gaps, and the
+   character has to be framed inside whatever is actually there. */
+function charSpace() {
+  const sec = sections[active] || sections[0];
+  const card = sec && sec.querySelector('.card');
+  if (!card) return innerHeight;
+  const pad = parseFloat(getComputedStyle(sec).paddingBottom) || 0;
+  return Math.max(140, innerHeight - pad - card.offsetHeight);
+}
+
+function frameCharacter() {
   camera.aspect = innerWidth / innerHeight;
   if (NARROW()) {
-    camera.position.set(0, 2.3, 11.4);
-    camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * 0.24, innerWidth, innerHeight);
+    const space = charSpace();
+    document.documentElement.style.setProperty('--char-space', space + 'px');
+    /* pull back until the character fills ~72% of that gap … */
+    const tall = (current && current.userData.tall) || 2;
+    /* leave a little more headroom on short screens so the nameplate
+       floats above him instead of landing on his face */
+    const fill = space < 220 ? 0.62 : 0.72;
+    const worldH = (tall * innerHeight) / (fill * space);
+    camera.position.set(0, 1.05, Math.max(7, worldH / (2 * TAN_HALF_FOV)));
+    /* … then shift the frame up so he sits in the middle of it */
+    camera.setViewOffset(innerWidth, innerHeight, 0, (innerHeight - space) / 2, innerWidth, innerHeight);
+    camera.lookAt(0, tall * 0.46, 0);
   } else {
+    document.documentElement.style.removeProperty('--char-space');
     camera.position.set(0, 2.15, 9.6);
     camera.clearViewOffset();
+    camera.lookAt(0, 0.92, 0);
   }
-  camera.lookAt(0, 0.92, 0);
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
 }
-addEventListener('resize', applyView);
+const applyView = frameCharacter;
+addEventListener('resize', frameCharacter);
 
 /* ------------------------------------------------------------- frame */
 let last = performance.now();
@@ -937,7 +965,8 @@ function frame(now) {
     if (show) {
       tagAnchor.set(rig.position.x, 2.28, 0).project(camera);
       tag.style.left = ((tagAnchor.x * 0.5 + 0.5) * innerWidth).toFixed(1) + 'px';
-      tag.style.top = ((-tagAnchor.y * 0.5 + 0.5) * innerHeight).toFixed(1) + 'px';
+      const ty = (-tagAnchor.y * 0.5 + 0.5) * innerHeight;
+      tag.style.top = Math.max(34, ty).toFixed(1) + 'px';
     }
   }
 
