@@ -4,7 +4,10 @@ Portfolio landing page: a pre-rendered voxel landscape with a real-time 3D
 character standing in front of it. Scroll and the character changes with the
 role beside it.
 
-**Live:** https://dior-portfolio-5182.web.app
+**Live:** https://abdunazarov.web.app
+
+Also served at `dior-abdunazarov.web.app` and `dior-portfolio-5182.web.app`, so older
+links keep working.
 
 ## How it is put together
 
